@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Prepara Aprova</title>
+</head>
+<body>
+    <noscript>Necessário ativar javascript para executar esse site</noscript>
+
+    <!-- Cabeçalho -->
+    <header class="header">
+        <h1 onclick="irParaInicio()">Prepara Aprova</h1>
+        <button class="botao-header" onclick="irParaInicio()">Início</button>
+    </header>
+
+    <!-- Página Inicial -->
+    <div class="inicio" id="inicio">
+        <h2>Bem-vindo ao fascinante universo do Prepara Aprova!</h2>
+        <p>Aqui, você iniciará uma jornada empolgante de preparação para o Enem, vestibulares e diversos concursos públicos, desvendando desafios e mistérios através de questões instigantes. Pratique com questões de diferentes provas, acompanhe seu progresso e descubra exatamente o que precisa estudar para alcançar seus objetivos. Prepare-se para transformar sua preparação em uma experiência envolvente e eficaz!</p>
+        
+        <div class="bloco-container">
+            <div class="block" id="intuitivo">
+                <h2>Intuitivo</h2>
+                <p>Prepare-se para explorar uma vasta coleção de perguntas intrigantes, organizadas por disciplina e tema. Aqui, você encontrará um verdadeiro tesouro de questões para praticar e se tornar um expert em conhecimento acadêmico!</p>
+            </div>
+            <div class="block" id="responsivo">
+                <h2>Responsivo</h2>
+                <p>Durante essa jornada, você poderá monitorar seu progresso e identificar seus pontos fortes e áreas a melhorar.</p>
+            </div>
+            <div class="block" id="dinamico">
+                <h2>Dinâmico</h2>
+                <p>Agora, prepare-se para enfrentar desafios acadêmicos e profissionais com o Prepara Aprova! A aventura começa aqui, e estamos prontos para guiá-lo rumo ao sucesso no conhecimento!</p>
+            </div>
+        </div>
+        
+        <!-- Separador Estilístico -->
+        <div class="separador"></div>
+        
+        <div class="button-container">
+            <button onclick="iniciarSimulados()">Iniciar Simulados</button>
+        </div>
+    </div>
+
+    <!-- Cronômetro -->
+    <div class="game" id="cronometro" style="display: none;">
+        <h2 id="tempo">Tempo decorrido: 00:00:00</h2>
+        <button id="botao-reiniciar-cronometro" class="botao-reiniciar">Reiniciar</button>
+    </div>
+
+    <div class="game" id="game" style="display: none;">
+        <div class="title">
+            <h4 id="title"></h4>
+        </div>
+        <div class="navegacao">
+            <h4 id="quantidade"></h4>
+            <h4 id="acertos"></h4>
+        </div>  
+        <div class="questao" id="questoes"></div>
+        <div class="navegacao">
+            <button class="botao" onclick="anterior()">Anterior</button>
+            <button class="botao" onclick="proximo()">Próximo</button>
+        </div>
+
+        <div class="barra-progresso">
+            <div class="progresso"></div>
+        </div>
+
+        <!-- Indicadores de progresso -->
+        <div id="indicadores" class="indicadores"></div>
+    </div>
+
+    <div class="game" id="provas" style="display: none;">
+        <h2>Selecione a prova para iniciar:</h2>
+    </div>
+
+    <div class="game" id="resultado" style="display: none;">
+        <h4 id="resultado-mensagem"></h4>
+        <div class="chart-container">
+            <canvas id="resultadoChart"></canvas>
+        </div>
+        <button id="botao-reiniciar-resultado">Reiniciar Prova</button>
+    </div>
+
+    <script>
+        var questoes = [];
+        var provas = [];
+        var numQuestao = 0;
+        var acertos = 0;
+        var respondeu = false;
+        var questoesRespondidas = [];
+        var respostasSelecionadas = []; // Guarda a resposta selecionada
+        var codigoProvaAtual = null;
+        var timer;
+        var segundos = 0;
+
+        document.addEventListener("DOMContentLoaded", function() {
+            var botaoReiniciarCronometro = document.getElementById("botao-reiniciar-cronometro");
+            var botaoReiniciarResultado = document.getElementById("botao-reiniciar-resultado");
+
+            if (botaoReiniciarCronometro) {
+                botaoReiniciarCronometro.addEventListener("click", reiniciarSimulado);
+            }
+
+            if (botaoReiniciarResultado) {
+                botaoReiniciarResultado.addEventListener("click", reiniciarSimulado);
+            }
+        });
+
+        function irParaInicio() {
+            location.reload();
+        }
+
+        function iniciarSimulados() {
+            document.getElementById("inicio").style.display = "none";
+            document.getElementById("provas").style.display = "block";
+            buscaProvas();
+        }
+
+        function reiniciarSimulado() {
+            // Parar o cronômetro
+            clearInterval(timer);
+            
+            // Reiniciar variáveis de estado
+            numQuestao = 0;
+            acertos = 0;
+            respondeu = false;
+            questoesRespondidas = new Array(questoes.length).fill(false);
+            respostasSelecionadas = new Array(questoes.length).fill(null);
+
+            // Atualizar indicadores de progresso
+            atualizaIndicadorQuestaoRespondida();
+
+            // Resetar a barra de progresso
+            atualizaBarraProgresso();
+
+            // Reiniciar o cronômetro
+            segundos = 0;
+            document.getElementById("tempo").textContent = "Tempo decorrido: 00:00:00";
+            iniciaCronometro();
+            
+            // Reiniciar a exibição das questões
+            EscreveQuestao(numQuestao);
+
+            // Certifique-se de que a tela correta esteja sendo mostrada
+            document.getElementById("game").style.display = "block";
+            document.getElementById("resultado").style.display = "none";
+        }
+
+        function buscaProvas() {
+            $.ajax({
+                "url": "https://apisunsale.azurewebsites.net/api/PublicQuestoes/GetTests",
+                "method": "GET",
+                "timeout": 0
+            }).done(function(response) {
+                provas = response.object;
+                EscreveProvas();
+            });
+        }
+
+        function EscreveProvas() {
+            var provasDiv = document.getElementById("provas");
+            provasDiv.innerHTML = '';
+            var selectInput = document.createElement("select");
+            selectInput.id = "mySelectInput";
+            
+            var option = document.createElement("option");
+            option.value = -1;
+            option.text = "Selecione";
+            selectInput.appendChild(option);
+
+            provas.forEach(function(prova) {
+                var option = document.createElement("option");
+                option.value = prova.codigo;
+                option.text = prova.nomeProva;
+                selectInput.appendChild(option);
+            });
+
+            selectInput.addEventListener("change", function() {
+                var selectedValue = selectInput.value;
+                if (selectedValue > 0) {
+                    document.getElementById("game").style.display = "";
+                    document.getElementById("provas").style.display = "none";
+                    document.getElementById("resultado").style.display = "none";
+                    document.getElementById("cronometro").style.display = "block";
+                    iniciaCronometro();
+                    buscaProva(selectedValue);
+                }
+            });
+
+            provasDiv.appendChild(selectInput);
+        }
+
+        function buscaProva(codigoProva) {
+            codigoProvaAtual = codigoProva;
+            $.ajax({
+                "url": "https://apisunsale.azurewebsites.net/api/PublicQuestoes/GetTests?id=" + codigoProva,
+                "method": "GET",
+                "timeout": 0
+            }).done(function(response) {
+                document.title = response.object[0].nomeProva;
+                document.getElementById("title").textContent = response.object[0].nomeProva;
+                buscaQuestoes(codigoProva);
+            });
+        }
+
+        function buscaQuestoes(codigoProva) {
+            $.ajax({
+                "url": "https://apisunsale.azurewebsites.net/api/PublicQuestoes/GetQuestoes?codigoProva=" + codigoProva,
+                "method": "GET",
+                "timeout": 0
+            }).done(function(response) {
+                questoes = response.object;
+                numQuestao = 0;
+                questoesRespondidas = new Array(questoes.length).fill(false);
+                respostasSelecionadas = new Array(questoes.length).fill(null);
+                EscreveQuestao(numQuestao);
+                atualizaBarraProgresso();
+            });
+        }
+
+        function iniciaCronometro() {
+            segundos = 0;
+            clearInterval(timer);
+            timer = setInterval(function() {
+                segundos++;
+                document.getElementById("tempo").textContent = "Tempo decorrido: " + formatarTempo(segundos);
+            }, 1000);
+        }
+
+        function formatarTempo(segundos) {
+            var horas = Math.floor(segundos / 3600);
+            var minutos = Math.floor((segundos % 3600) / 60);
+            var secs = segundos % 60;
+            return (horas < 10 ? "0" : "") + horas + ":" + (minutos < 10 ? "0" : "") + minutos + ":" + (secs < 10 ? "0" : "") + secs;
+        }
+
+        function proximo() {
+            if (!respondeu && !questoesRespondidas[numQuestao]) {
+                alert("Por favor, responda a questão antes de avançar.");
+                return;
+            }
+            if (numQuestao + 1 == questoes.length) {
+                if (questoesRespondidas.every(val => val)) {
+                    clearInterval(timer);
+                    abreResultado();
+                } else {
+                    alert("Por favor, responda todas as questões antes de finalizar.");
+                }
+            } else {
+                numQuestao++;
+                EscreveQuestao(numQuestao);
+                atualizaBarraProgresso();
+            }
+        }
+
+        function anterior() {
+            if (numQuestao - 1 >= 0) {
+                numQuestao--;
+                EscreveQuestao(numQuestao);
+                atualizaBarraProgresso();
+            }
+        }
+
+        function abreResultado() {
+            document.getElementById("game").style.display = "none";
+            document.getElementById("provas").style.display = "none";
+            document.getElementById("resultado").style.display = "";
+
+            var resultadoDiv = document.getElementById("resultado-mensagem");
+            resultadoDiv.textContent = acertos > 0 ? 'Parabéns! Você acertou ' + acertos + ' de ' + questoes.length + ' em ' + formatarTempo(segundos) + '!' : 'Você errou todas!';
+
+            var ctx = document.getElementById('resultadoChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Acertos', 'Erros'],
+                    datasets: [{
+                        data: [acertos, questoes.length - acertos],
+                        backgroundColor: ['#32CD32', '#FF6347'],
+                    }]
+                }
+            });
+        }
+
+        function createMarkupWithImages(text, anexos) {
+            let temp = text;
+
+            if (anexos && anexos.length > 0) {
+                for (let i = 0; i < anexos.length; i++) {
+                    temp = temp.replace(
+                        `<img src="#" alt="Anexo" id="divAnexo${i}"/>`,
+                        `<img src="${anexos[i].link}" alt="Anexo" id="divAnexo${i}" style="max-width: 100%; height: auto;" />`
+                    );
+                }
+            }
+            return temp;
+        }
+
+        function EscreveQuestao(questao) {
+            if (questoes[questao]) {
+                var questoesDiv = document.getElementById("questoes");
+                questoesDiv.innerHTML = "";
+
+                var anexos = questoes[questao].anexosQuestoes || [];
+                var newParagraph = document.createElement("h4");
+                newParagraph.innerHTML = createMarkupWithImages(questoes[questao].campoQuestao, anexos);
+
+                var newRespostas = document.createElement("div");
+                newRespostas.setAttribute("class", "respostas");
+
+                questoes[questao].respostasQuestoes.forEach(function(resposta, index) {
+                    var divResposta = document.createElement("div");
+                    divResposta.setAttribute("class", "resposta");
+                    divResposta.setAttribute("id", resposta.certa);
+
+                    var newRadioInput = document.createElement("input");
+                    newRadioInput.setAttribute("type", "radio");
+                    newRadioInput.setAttribute("name", "radioGroup");
+                    newRadioInput.disabled = questoesRespondidas[questao] || respondeu;
+
+                    if (respostasSelecionadas[questao] === index) {
+                        newRadioInput.checked = true;
+                        if (!divResposta.querySelector('h4')) { // Evita múltiplas inserções do resultado
+                            if (resposta.certa == "1") {
+                                divResposta.innerHTML += `<h4 style="color: green; padding-left: 8px;">Certa</h4>`;
+                            } else {
+                                divResposta.innerHTML += `<h4 style="color: red; padding-left: 8px;">Errado</h4>`;
+                            }
+                        }
+                    }
+
+                    divResposta.addEventListener("click", function() {
+                        if (respondeu || questoesRespondidas[questao]) return;
+                        var clickedElementId = this.id;
+                        if (clickedElementId == "1") {
+                            this.innerHTML += `<h4 style="color: green; padding-left: 8px;">Certa</h4>`;
+                            acertos++;
+                            document.getElementById("acertos").textContent = "Acertos: " + acertos;
+                        } else {
+                            this.innerHTML += `<h4 style="color: red; padding-left: 8px;">Errado</h4>`;
+                        }
+                        document.getElementsByName('radioGroup').forEach(elem => elem.disabled = true);
+                        respostasSelecionadas[questao] = index;
+                        respondeu = true;
+                        questoesRespondidas[numQuestao] = true;
+                        atualizaIndicadorQuestaoRespondida();
+                    });
+
+                    var paragraphRes = document.createElement("h4");
+                    paragraphRes.innerHTML = createMarkupWithImages(resposta.textoResposta, resposta.anexos || []);
+                    divResposta.appendChild(newRadioInput);
+                    divResposta.appendChild(paragraphRes);
+                    newRespostas.appendChild(divResposta);
+                });
+
+                questoesDiv.appendChild(newParagraph);
+                questoesDiv.appendChild(newRespostas);
+
+                document.getElementById("quantidade").textContent = "Questão " + (numQuestao + 1) + " de " + questoes.length;
+                document.getElementById("acertos").textContent = "Acertos: " + acertos;
+                respondeu = false;
+            }
+        }
+
+        function atualizaIndicadorQuestaoRespondida() {
+            var indicacaoDiv = document.getElementById("indicadores");
+            indicacaoDiv.innerHTML = "";
+
+            questoesRespondidas.forEach(function(resposta, index) {
+                var indicacao = document.createElement("div");
+                indicacao.classList.add("indicador");
+                if (resposta) {
+                    indicacao.innerHTML = '<span class="check-icon">✔️</span>';
+                }
+                indicacao.addEventListener("click", function() {
+                    numQuestao = index;
+                    EscreveQuestao(numQuestao);
+                });
+                indicacaoDiv.appendChild(indicacao);
+            });
+        }
+
+        function atualizaBarraProgresso() {
+            document.querySelector('.progresso').style.width = '0%';
+        }
+    </script>
+</body>
+</html>

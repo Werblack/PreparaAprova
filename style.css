@@ -1,0 +1,406 @@
+/* Estilo do corpo da página */
+body {
+    font-family: sans-serif;
+    background-color: #160c36;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+/* Envoltório para centralizar o conteúdo */
+.wrapper {
+    width: 100%;
+    max-width: 1100px;
+    padding: 20px;
+    margin: 20px;
+    box-sizing: border-box;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Cabeçalho */
+.header {
+    width: 100%;
+    padding: 10px 20px;
+    background-color: #444444;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.header h1, .botao-header {
+    font-size: 24px;
+    color: #1E90FF;
+    cursor: pointer;
+    margin: 0;
+}
+
+.botao-header {
+    background: none;
+    border: none;
+    padding: 10px;
+    color: #1E90FF;
+    font-size: 16px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.botao-header:hover {
+    color: #FFF;
+}
+
+/* Texto de enredo abaixo do cabeçalho */
+.inicio {
+    text-align: center;
+    padding: 20px 0;
+    flex-grow: 1;
+}
+
+.inicio h2 {
+    font-size: 1.8em;
+    margin: 20px 0;
+}
+
+.inicio p {
+    max-width: 800px;
+    font-size: 1em;
+    margin: 10px auto;
+    line-height: 1.6;
+}
+
+/* Estilo dos blocos da página inicial */
+.bloco-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+    max-width: 800px;
+    margin: 20px 0;
+}
+
+.block {
+    background-color: #323232;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    flex: 1 1 250px;
+    max-width: 100%;
+    text-align: left;
+}
+
+.block h2 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.block p {
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+/* Separador para o botão */
+.separador {
+    width: 100%;
+    max-width: 800px;
+    border-bottom: 1px solid #fff;
+    margin: 20px auto;
+}
+
+/* Container do botão na primeira tela */
+.button-container {
+    text-align: center;
+    margin-top: 20px;
+    width: 100%;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px 32px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin: 20px 0;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* Container principal do jogo */
+.game {
+    padding: 20px;
+    background-color: #323232;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    margin-bottom: 24px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Estilo do título do jogo */
+.game h1 {
+    text-align: center;
+    margin: -10px;
+    cursor: pointer;
+    font-size: 24px;
+    color: #1E90FF;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* Estilo para a área de questões */
+.questao {
+    width: 100%;
+    margin: auto;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Título das questões */
+.title {
+    text-align: justify;
+}
+
+.title p {
+    font-weight: bold;
+    font-size: 32px;
+}
+
+/* Estilo da lista de respostas */
+.respostas {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: auto;
+    cursor: pointer;
+}
+
+/* Estilo das opções de resposta */
+.resposta {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 10px;
+    padding: 12px;
+    background-color: #444444;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+    max-width: 800px;
+    width: 100%;
+}
+
+.resposta:hover {
+    background-color: #333333;
+}
+
+/* Navegação entre as questões */
+.navegacao {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.botao {
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-size: 15px;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.5s;
+    background-color: #111111;
+    color: #1E90FF;
+    font-weight: bold;
+    border: 2px solid #1E90FF;
+    width: 48%;
+    margin: 0 4px;
+}
+
+.botao:hover {
+    background-color: #7B68EE;
+    color: white;
+}
+
+/* Desabilitar botões quando a questão não for respondida */
+.botao:disabled {
+    background-color: #444444;
+    cursor: not-allowed;
+    color: #666666;
+}
+
+/* Indicadores de questões respondidas */
+#indicadores {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+}
+
+/* Estilo para o ícone de "check" */
+.check-icon {
+    font-size: 1em; /* Use um tamanho relativo para maior flexibilidade */
+    color: #32CD32;
+}
+
+.indicador {
+    width: 24px;
+    height: 24px;
+    margin: 0 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #444444;
+    border-radius: 50%;
+    cursor: pointer;
+    overflow: hidden; /* Esconder qualquer "transbordo" */
+    box-sizing: border-box;
+}
+
+.indicador:hover {
+    background-color: #333333;
+}
+
+
+/* Exibição de quantidade e acertos */
+.quantidade {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* Estilo para o campo de seleção de provas */
+.game select {
+    width: 100%; /* Permite máxima largura no contêiner */
+    max-width: 300px; /* Limite de largura em telas maiores */
+    padding: 10px; /* Espaço interno adequado */
+    border-radius: 10px;
+    background-color: #f70000;
+    color: #FFF;
+    border: 2px solid #1E90FF;
+    box-sizing: border-box; /* Inclui padding e borda nas dimensões */
+    margin: 10px 0;
+    appearance: none; /* Remove estilos padrão do navegador */
+    -webkit-appearance: none; /* Remove estilo no Safari */
+    -moz-appearance: none; /* Remove estilo no Firefox */
+}
+.game option {
+    color: #ffffff; /* Cor do texto das opções */
+}
+/* Estilo da área de resultado final */
+#resultado h4 {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #1E90FF;
+}
+
+/* Barra de Progresso */
+.barra-progresso {
+    width: 100%;
+    height: 20px;
+    background-color: #444444;
+    border-radius: 10px;
+    margin-top: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.progresso {
+    height: 100%;
+    width: 0%;
+    background-color: #32CD32;
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+/* Estilo do cronômetro */
+#tempo { 
+    padding: 5px;
+}
+
+.separador {
+    width: 100%;
+    max-width: 800px;
+    border-bottom: 1px solid #fff;
+    margin: 20px auto;
+}
+
+/* Estilo específico para o contêiner do gráfico */
+.chart-container {
+    width: 100%;
+    max-width: 400px;
+    margin: 20px auto;
+}
+
+/* Ajustes de layout responsivo */
+/* Ajustes de layout responsivo */
+@media (max-width: 768px) {
+    .bloco-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .block {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .inicio h2 {
+        font-size: 1.5em;
+    }
+
+    .inicio p {
+        font-size: 1em;
+        margin: 10px;
+    }
+
+    .game {
+        padding: 15px;
+    }
+
+    .botao {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .navegacao {
+        flex-direction: column;
+    }
+
+    .chart-container {
+        max-width: 300px;
+    }
+
+    .indicador {
+        width: 20px; /* Ajustar tamanho para telas menores */
+        height: 20px;
+        margin: 0 1px; /* Ajuste de margens para evitar espaçamento exagerado */
+    }
+
+    .check-icon {
+        font-size: 0.8em; /* Reduzir tamanho para melhor ajuste */
+    }
+    .game select {
+        width: 100%; /* Ocupe toda a largura disponível */
+        max-width: none; /* Remova o limite para ocupar totalmente o contêiner */
+        padding: 8px; /* Ajustar espaço interno para economia de espaço */
+    }
+}
+
+
+
